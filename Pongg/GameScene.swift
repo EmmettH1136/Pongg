@@ -9,18 +9,47 @@
 import SpriteKit
 import GameplayKit
 
+let ballC : UInt32 = 1
+let topC : UInt32 = 2
+let paddleC : UInt32 = 4 // 0 x 1 << 5
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	var topPaddle = SKSpriteNode()
-//	var ball = SKSpriteNode()
-    
+	var ball = SKSpriteNode()
+	let xN = Int.random(in: 0...1)
+	
+	
     override func didMove(to view: SKView) {
 		physicsWorld.contactDelegate = self
         let border = SKPhysicsBody(edgeLoopFrom: self.frame)
 		self.physicsBody = border
 		
-//		ball = self.childNode(withName: "ball") as! SKSpriteNode
+		let topLeft = CGPoint(x: frame.origin.x, y: -frame.origin.y)
+		let topRight = CGPoint(x: -frame.origin.x, y: -frame.origin.y)
+		
+		let top = SKNode()
+		top.name = "top"
+		top.physicsBody = SKPhysicsBody(edgeFrom: topLeft, to: topRight)
+		self.addChild(top)
+		
+		ball = self.childNode(withName: "grapfrut") as! SKSpriteNode
 		topPaddle = self.childNode(withName: "topPaddle") as! SKSpriteNode
+		let ballPhys = ball.physicsBody
+		
+		ballPhys!.velocity.dy = CGFloat(Int.random(in: 100...250))
+		if xN == 0 {
+			ballPhys!.velocity.dx = CGFloat(Int.random(in: -250 ... -100))
+		} else {
+			ballPhys!.velocity.dx = CGFloat(Int.random(in: 100...250))
+		}
+		
+		ball.physicsBody?.categoryBitMask = ballC
+		topPaddle.physicsBody?.categoryBitMask = paddleC
+		top.physicsBody?.categoryBitMask = topC
+		
+		ball.physicsBody?.contactTestBitMask = topC|paddleC
+		
     }
 	
 	func didBegin(_ contact: SKPhysicsContact) {
